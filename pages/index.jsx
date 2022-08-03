@@ -6,8 +6,8 @@ import styled from "styled-components";
 import useStickyState from "../hooks/useStickyState";
 
 export default function Home() {
-  const [spend, setSpend] = useStickyState("spend", "0");
-  const [budget, setBudget] = useStickyState("budget", "1000");
+  const [spend, setSpend] = useState(0);
+  const [budget, setBudget] = useStickyState("budget", 1000);
   const [monthResetDate, setMonthResetDate] = useStickyState(
     "monthResetDate",
     28
@@ -155,6 +155,7 @@ const Subheading = styled.div`
 
 const Description = styled.div`
   margin-bottom: 3px;
+  text-align: center;
 `;
 
 const Bold = styled.span`
