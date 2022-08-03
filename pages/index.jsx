@@ -1,14 +1,17 @@
 import Head from "next/head";
-import Image from "next/image";
 import styles from "../styles/Home.module.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import styled from "styled-components";
+import useStickyState from "../hooks/useStickyState";
 
 export default function Home() {
-  const [spend, setSpend] = useState(0);
-  const [budget, setBudget] = useState(1000);
-  const [monthResetDate, setMonthResetDate] = useState(28);
+  const [spend, setSpend] = useStickyState("spend", "0");
+  const [budget, setBudget] = useStickyState("budget", "1000");
+  const [monthResetDate, setMonthResetDate] = useStickyState(
+    "monthResetDate",
+    28
+  );
 
   const currentDate = DateTime.now();
   const startDate = DateTime.fromObject({
@@ -37,6 +40,10 @@ export default function Home() {
     color = "orange";
   }
   if (diffToBudget < -99) color = "red";
+
+  const daysLeft = 30 - daysPast;
+  const newDailyBudget = (budget - spend) / daysLeft;
+  const newWeeklyBudget = newDailyBudget * 7;
 
   return (
     <div className={styles.container}>
@@ -101,6 +108,24 @@ export default function Home() {
           so far
         </Description>
         <Spacer />
+        {diffToBudget > 49 && (
+          <>
+            <Subheading>Future</Subheading>
+            <Description>
+              You can now spend £{Math.floor(newDailyBudget)} a day / £
+              {Math.floor(newWeeklyBudget)} a week
+            </Description>
+          </>
+        )}
+        {diffToBudget < -50 && (
+          <>
+            <Subheading>Future</Subheading>
+            <Description>
+              Try to spend less than £{Math.floor(newDailyBudget)} day / £
+              {Math.floor(newWeeklyBudget)} week to get back on track
+            </Description>
+          </>
+        )}
       </main>
     </div>
   );
@@ -142,4 +167,5 @@ const Spacer = styled.div`
 
 const Color = styled.span`
   color: ${(props) => props.color};
+  font-weight: 500;
 `;
