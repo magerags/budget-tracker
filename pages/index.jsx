@@ -12,6 +12,7 @@ export default function Home() {
     "monthResetDate",
     28
   );
+  const [clauds, setClauds] = useStickyState("clauds", false);
 
   const currentDate = DateTime.now();
   const startDate = DateTime.fromObject({
@@ -45,6 +46,14 @@ export default function Home() {
   const newDailyBudget = (budget - spend) / daysLeft;
   const newWeeklyBudget = newDailyBudget * 7;
 
+  useEffect(() => {
+    if (clauds) {
+      setMonthResetDate(20);
+    } else {
+      setMonthResetDate(28);
+    }
+  }, [clauds]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -58,6 +67,16 @@ export default function Home() {
 
       <main className={styles.main}>
         <Title className={styles.title}>Budget Tracker</Title>
+        <Spacer />
+        <Sunflower active={clauds}>🌻</Sunflower>
+        <Switch>
+          <SwitchInput
+            type="checkbox"
+            value={clauds}
+            onChange={(e) => setClauds(e.target.checked)}
+          />
+          <Slider />
+        </Switch>
         <Spacer />
         <InputWrapper>
           <Label>Your budget: </Label>
@@ -169,4 +188,62 @@ const Spacer = styled.div`
 const Color = styled.span`
   color: ${(props) => props.color};
   font-weight: 500;
+`;
+
+const Switch = styled.label`
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+  margin-top: -5px;
+`;
+
+const Slider = styled.span`
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccd6d8;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  border-radius: 34px;
+
+  &:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+`;
+
+const SwitchInput = styled.input`
+  opacity: 0;
+  width: 0;
+  height: 0;
+
+  :checked + ${Slider} {
+    background-color: lightgreen;
+  }
+
+  :focus {
+    box-shadow: 0 0 1px #2196f3;
+  }
+
+  &:checked + ${Slider}:before {
+    transform: translateX(16px);
+  }
+`;
+
+const Sunflower = styled.div`
+  font-size: 40px;
+  transition: 1s ease;
+  transform: ${(props) => (props.active ? "scale(1)" : "scale(0.8)")};
 `;
