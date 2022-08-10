@@ -233,10 +233,6 @@ const SwitchInput = styled.input`
     background-color: lightgreen;
   }
 
-  :focus {
-    box-shadow: 0 0 1px #2196f3;
-  }
-
   &:checked + ${Slider}:before {
     transform: translateX(16px);
   }
