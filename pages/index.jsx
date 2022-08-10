@@ -1,6 +1,6 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { DateTime } from "luxon";
 import styled from "styled-components";
 import useStickyState from "../hooks/useStickyState";
@@ -47,12 +47,15 @@ export default function Home() {
   const newWeeklyBudget = newDailyBudget * 7;
 
   useEffect(() => {
+    checkbox.current.checked = clauds;
     if (clauds) {
       setMonthResetDate(20);
     } else {
       setMonthResetDate(28);
     }
   }, [clauds]);
+
+  const checkbox = useRef(null);
 
   return (
     <div className={styles.container}>
@@ -72,6 +75,7 @@ export default function Home() {
         <Switch>
           <SwitchInput
             type="checkbox"
+            ref={checkbox}
             value={clauds}
             onChange={(e) => setClauds(e.target.checked)}
           />
