@@ -13,13 +13,26 @@ export default function Home() {
     "monthResetDate",
     20
   );
-  const [clauds, setClauds] = useStickyState("clauds", false);
 
   const currentDate = DateTime.now();
   let startDate = DateTime.fromObject({
     day: 1,
     month: currentDate.month,
   });
+
+  if (customPeriod && monthResetDate > currentDate.day) {
+    startDate = DateTime.fromObject({
+      day: monthResetDate,
+      month: currentDate.month - 1,
+    });
+  }
+
+  if (customPeriod && monthResetDate <= currentDate.day) {
+    startDate = DateTime.fromObject({
+      day: monthResetDate,
+      month: currentDate.month,
+    });
+  }
 
   const days = currentDate.diff(startDate, "days").toObject();
 
@@ -43,21 +56,13 @@ export default function Home() {
   }
   if (diffToBudget < -99) color = "red";
 
-  const daysLeft = 30 - daysPast;
+  const daysLeft = currentDate.daysInMonth - daysPast;
   const newDailyBudget = (budget - spend) / daysLeft;
   const newWeeklyBudget = newDailyBudget * 7;
 
-  useEffect(() => {
-    checkbox.current.checked = clauds;
-    if (clauds) {
-      startDate = DateTime.fromObject({
-        day: 20,
-        month: currentDate.month - 1,
-      });
-    }
-  }, [clauds]);
-
   const checkbox = useRef(null);
+
+  const dates = [...Array(28).keys()];
 
   return (
     <div className={styles.container}>
@@ -73,16 +78,42 @@ export default function Home() {
       <main className={styles.main}>
         <Title className={styles.title}>Budget Tracker</Title>
         <Spacer />
-        <Sunflower active={clauds}>🌻</Sunflower>
-        <Switch>
-          <SwitchInput
-            type="checkbox"
-            ref={checkbox}
-            value={clauds}
-            onChange={(e) => setClauds(e.target.checked)}
-          />
-          <Slider />
-        </Switch>
+        <OptionBox>
+          <SwitchWrapper
+            onClick={() => {
+              setCustomPeriod(!customPeriod);
+              checkbox.current.checked = !checkbox.current.checked;
+            }}
+          >
+            <Description>Custom reset date?</Description>
+            <Switch>
+              <SwitchInput
+                disabled="true"
+                ref={checkbox}
+                type="checkbox"
+                value={customPeriod}
+              />
+              <Slider />
+            </Switch>
+          </SwitchWrapper>
+          {customPeriod && (
+            <DateSelectWrapper>
+              <Label>Select a date</Label>
+              <Select
+                value={monthResetDate}
+                onChange={(e) => setMonthResetDate(e.target.value)}
+              >
+                {dates.map((n) => {
+                  return (
+                    <Option key={n + 1} value={n + 1}>
+                      {n + 1}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </DateSelectWrapper>
+          )}
+        </OptionBox>
         <Spacer />
         <InputWrapper>
           <Label>Your budget: </Label>
@@ -133,21 +164,27 @@ export default function Home() {
           so far
         </Description>
         <Spacer />
-        {diffToBudget > 49 && (
+        {diffToBudget > 49 && daysLeft > 0 && (
           <>
             <Subheading>Future</Subheading>
             <Description>
-              You can now spend £{Math.floor(newDailyBudget)} a day / £
-              {Math.floor(newWeeklyBudget)} a week
+              You can now spend £{Math.floor(newDailyBudget)} a day
             </Description>
           </>
         )}
-        {diffToBudget < -50 && (
+        {diffToBudget < -50 && daysLeft > 0 && (
           <>
             <Subheading>Future</Subheading>
             <Description>
-              Try to spend less than £{Math.floor(newDailyBudget)} day / £
-              {Math.floor(newWeeklyBudget)} week to get back on track
+              Try to spend less than £{Math.floor(newDailyBudget)} day
+            </Description>
+          </>
+        )}
+        {daysLeft == 0 && diffToBudget > 1 && (
+          <>
+            <Subheading>Future</Subheading>
+            <Description>
+              You have £{Math.floor(budget - spend)} left to spend today!
             </Description>
           </>
         )}
@@ -201,7 +238,6 @@ const Switch = styled.label`
   display: inline-block;
   width: 40px;
   height: 24px;
-  margin-top: -5px;
 `;
 
 const Slider = styled.span`
@@ -244,8 +280,43 @@ const SwitchInput = styled.input`
   }
 `;
 
-const Sunflower = styled.div`
-  font-size: 40px;
-  transition: 1s ease;
-  transform: ${(props) => (props.active ? "scale(1)" : "scale(0.8)")};
+const OptionBox = styled.div`
+  padding: 15px 20px;
+  border-radius: 15px;
+  background-color: #e4f1f3;
+  width: 280px;
+`;
+
+const SwitchWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const Select = styled.select`
+  width: 15.5%;
+  background-color: transparent;
+  border: none;
+  font-size: 15px;
+  margin-right: 2px;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:active {
+    outline: none;
+  }
+`;
+
+const Option = styled.option``;
+
+const DateSelectWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
 `;
