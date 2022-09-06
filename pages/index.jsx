@@ -8,16 +8,17 @@ import useStickyState from "../hooks/useStickyState";
 export default function Home() {
   const [spend, setSpend] = useState(0);
   const [budget, setBudget] = useStickyState("budget", 1000);
+  const [customPeriod, setCustomPeriod] = useStickyState("customPeriod", false);
   const [monthResetDate, setMonthResetDate] = useStickyState(
     "monthResetDate",
-    28
+    20
   );
   const [clauds, setClauds] = useStickyState("clauds", false);
 
   const currentDate = DateTime.now();
-  const startDate = DateTime.fromObject({
-    day: monthResetDate,
-    month: currentDate.month - 1,
+  let startDate = DateTime.fromObject({
+    day: 1,
+    month: currentDate.month,
   });
 
   const days = currentDate.diff(startDate, "days").toObject();
@@ -26,7 +27,7 @@ export default function Home() {
 
   const percentageSpend = Math.round((spend / budget) * 100);
 
-  const dailyBudget = budget / 30;
+  const dailyBudget = budget / currentDate.daysInMonth;
   const weeklyBudget = dailyBudget * 7;
   const todaysBudget = dailyBudget * daysPast;
 
@@ -49,9 +50,10 @@ export default function Home() {
   useEffect(() => {
     checkbox.current.checked = clauds;
     if (clauds) {
-      setMonthResetDate(20);
-    } else {
-      setMonthResetDate(28);
+      startDate = DateTime.fromObject({
+        day: 20,
+        month: currentDate.month - 1,
+      });
     }
   }, [clauds]);
 
