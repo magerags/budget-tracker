@@ -86,7 +86,6 @@ export default function Home() {
           layout
           transition={{
             type: "spring",
-            damping: 7,
           }}
         >
           <SwitchWrapper
