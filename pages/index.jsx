@@ -4,9 +4,11 @@ import React, { useEffect, useState, useRef } from "react";
 import { DateTime } from "luxon";
 import styled from "styled-components";
 import useStickyState from "../hooks/useStickyState";
+import { motion } from "framer-motion";
 
 export default function Home() {
   const [spend, setSpend] = useState(0);
+  const [height, setHeight] = useState(60);
   const [budget, setBudget] = useStickyState("budget", 1000);
   const [customPeriod, setCustomPeriod] = useStickyState("customPeriod", false);
   const [monthResetDate, setMonthResetDate] = useStickyState(
@@ -76,18 +78,22 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <Title className={styles.title}>Budget Tracker</Title>
+        <Title className={styles.title} layout>
+          Budget Tracker
+        </Title>
         <Spacer />
-        <OptionBox>
+        <OptionBox layout transition={{ type: "spring" }}>
           <SwitchWrapper
+            layout
             onClick={() => {
               setCustomPeriod(!customPeriod);
               checkbox.current.checked = !checkbox.current.checked;
             }}
           >
-            <Description>Custom reset date?</Description>
-            <Switch>
+            <Description layout>Custom reset date?</Description>
+            <Switch layout>
               <SwitchInput
+                layout
                 disabled="true"
                 ref={checkbox}
                 type="checkbox"
@@ -97,7 +103,12 @@ export default function Home() {
             </Switch>
           </SwitchWrapper>
           {customPeriod && (
-            <DateSelectWrapper>
+            <DateSelectWrapper
+              layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+            >
               <Label>Select a date</Label>
               <Select
                 value={monthResetDate}
@@ -193,13 +204,13 @@ export default function Home() {
   );
 }
 
-const Title = styled.div``;
+const Title = styled(motion.div)``;
 
 const InputWrapper = styled.div`
   margin-bottom: 10px;
 `;
 
-const Label = styled.label``;
+const Label = styled(motion.label)``;
 
 const Input = styled.input`
   border: none;
@@ -215,7 +226,7 @@ const Subheading = styled.div`
   margin-bottom: 7px;
 `;
 
-const Description = styled.div`
+const Description = styled(motion.div)`
   margin-bottom: 3px;
   text-align: center;
 `;
@@ -233,14 +244,14 @@ const Color = styled.span`
   font-weight: 500;
 `;
 
-const Switch = styled.label`
+const Switch = styled(motion.label)`
   position: relative;
   display: inline-block;
   width: 40px;
   height: 24px;
 `;
 
-const Slider = styled.span`
+const Slider = styled(motion.span)`
   position: absolute;
   cursor: pointer;
   top: 0;
@@ -266,7 +277,7 @@ const Slider = styled.span`
   }
 `;
 
-const SwitchInput = styled.input`
+const SwitchInput = styled(motion.input)`
   opacity: 0;
   width: 0;
   height: 0;
@@ -280,14 +291,14 @@ const SwitchInput = styled.input`
   }
 `;
 
-const OptionBox = styled.div`
+const OptionBox = styled(motion.div)`
   padding: 15px 20px;
   border-radius: 15px;
   background-color: #e4f1f3;
   width: 280px;
 `;
 
-const SwitchWrapper = styled.div`
+const SwitchWrapper = styled(motion.div)`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -315,7 +326,7 @@ const Select = styled.select`
 
 const Option = styled.option``;
 
-const DateSelectWrapper = styled.div`
+const DateSelectWrapper = styled(motion.div)`
   display: flex;
   justify-content: space-between;
   margin-top: 10px;
