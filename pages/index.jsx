@@ -82,7 +82,13 @@ export default function Home() {
           Budget Tracker
         </Title>
         <Spacer />
-        <OptionBox layout transition={{ type: "spring" }}>
+        <OptionBox
+          layout
+          transition={{
+            type: "spring",
+            damping: 7,
+          }}
+        >
           <SwitchWrapper
             layout
             onClick={() => {
@@ -126,79 +132,81 @@ export default function Home() {
           )}
         </OptionBox>
         <Spacer />
-        <InputWrapper>
-          <Label>Your budget: </Label>
-          <Input
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-            label="Budget"
-            name="budget"
-            type="number"
-          />
-        </InputWrapper>
-        <InputWrapper>
-          <Label>Your spend: </Label>
-          <Input
-            value={spend}
-            onChange={(e) => setSpend(e.target.value)}
-            label="Spend"
-            name="spend"
-            type="number"
-          />
-        </InputWrapper>
-        <Spacer />
-        <Subheading>Initial Budget</Subheading>
-        <Description>
-          You can spend £{Math.floor(dailyBudget)} a day
-        </Description>
-        <Description>
-          You can spend £{Math.floor(weeklyBudget)} a week
-        </Description>
-        <Spacer />
-        <Subheading>Progress</Subheading>
-        <Description>
-          You are <Bold>{daysPast}</Bold> days into your budget period
-        </Description>
-        <Description>
-          You have spent <Bold>{percentageSpend}%</Bold> of your budget
-        </Description>
-        <Description>
-          Your budget up to today is <Bold>£{Math.floor(todaysBudget)}</Bold>
-        </Description>
-        <Spacer />
-        <Description>
-          Therefore you are{" "}
-          <Color color={color}>
-            {diffToBudget && <span>£</span>}
-            {diffToBudget && Math.abs(diffToBudget)} {relativeToBudget} budget
-          </Color>{" "}
-          so far
-        </Description>
-        <Spacer />
-        {diffToBudget > 49 && daysLeft > 0 && (
-          <>
-            <Subheading>Future</Subheading>
-            <Description>
-              You can now spend £{Math.floor(newDailyBudget)} a day
-            </Description>
-          </>
-        )}
-        {diffToBudget < -50 && daysLeft > 0 && (
-          <>
-            <Subheading>Future</Subheading>
-            <Description>
-              Try to spend less than £{Math.floor(newDailyBudget)} day
-            </Description>
-          </>
-        )}
-        {daysLeft == 0 && diffToBudget > 1 && (
-          <>
-            <Subheading>Future</Subheading>
-            <Description>
-              You have £{Math.floor(budget - spend)} left to spend today!
-            </Description>
-          </>
-        )}
+        <Everything layout>
+          <InputWrapper>
+            <Label>Your budget: </Label>
+            <Input
+              value={budget}
+              onChange={(e) => setBudget(e.target.value)}
+              label="Budget"
+              name="budget"
+              type="number"
+            />
+          </InputWrapper>
+          <InputWrapper>
+            <Label>Your spend: </Label>
+            <Input
+              value={spend}
+              onChange={(e) => setSpend(e.target.value)}
+              label="Spend"
+              name="spend"
+              type="number"
+            />
+          </InputWrapper>
+          <Spacer />
+          <Subheading>Initial Budget</Subheading>
+          <Description>
+            You can spend £{Math.floor(dailyBudget)} a day
+          </Description>
+          <Description>
+            You can spend £{Math.floor(weeklyBudget)} a week
+          </Description>
+          <Spacer />
+          <Subheading>Progress</Subheading>
+          <Description>
+            You are <Bold>{daysPast}</Bold> days into your budget period
+          </Description>
+          <Description>
+            You have spent <Bold>{percentageSpend}%</Bold> of your budget
+          </Description>
+          <Description>
+            Your budget up to today is <Bold>£{Math.floor(todaysBudget)}</Bold>
+          </Description>
+          <Spacer />
+          <Description>
+            Therefore you are{" "}
+            <Color color={color}>
+              {diffToBudget && <span>£</span>}
+              {diffToBudget && Math.abs(diffToBudget)} {relativeToBudget} budget
+            </Color>{" "}
+            so far
+          </Description>
+          <Spacer />
+          {diffToBudget > 49 && daysLeft > 0 && (
+            <>
+              <Subheading>Future</Subheading>
+              <Description>
+                You can now spend £{Math.floor(newDailyBudget)} a day
+              </Description>
+            </>
+          )}
+          {diffToBudget < -50 && daysLeft > 0 && (
+            <>
+              <Subheading>Future</Subheading>
+              <Description>
+                Try to spend less than £{Math.floor(newDailyBudget)} day
+              </Description>
+            </>
+          )}
+          {daysLeft == 0 && diffToBudget > 1 && (
+            <>
+              <Subheading>Future</Subheading>
+              <Description>
+                You have £{Math.floor(budget - spend)} left to spend today!
+              </Description>
+            </>
+          )}
+        </Everything>
       </main>
     </div>
   );
@@ -206,7 +214,7 @@ export default function Home() {
 
 const Title = styled(motion.div)``;
 
-const InputWrapper = styled.div`
+const InputWrapper = styled(motion.div)`
   margin-bottom: 10px;
 `;
 
@@ -330,4 +338,11 @@ const DateSelectWrapper = styled(motion.div)`
   display: flex;
   justify-content: space-between;
   margin-top: 10px;
+`;
+
+const Everything = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `;
