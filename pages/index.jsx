@@ -8,7 +8,6 @@ import { motion } from "framer-motion";
 
 export default function Home() {
   const [spend, setSpend] = useState(0);
-  const [height, setHeight] = useState(60);
   const [budget, setBudget] = useStickyState("budget", 1000);
   const [customPeriod, setCustomPeriod] = useStickyState("customPeriod", false);
   const [monthResetDate, setMonthResetDate] = useStickyState(
@@ -92,7 +91,7 @@ export default function Home() {
             layout
             onClick={() => {
               setCustomPeriod(!customPeriod);
-              checkbox.current.checked = !checkbox.current.checked;
+              checkbox.current.checked = !customPeriod;
             }}
           >
             <Description layout>Custom reset date?</Description>
