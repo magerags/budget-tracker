@@ -66,7 +66,7 @@ export default function Home() {
   const dates = [...Array(28).keys()];
 
   useEffect(() => {
-    checkbox.current.checked = !customPeriod;
+    checkbox.current.checked = customPeriod;
   }, [customPeriod]);
 
   return (
