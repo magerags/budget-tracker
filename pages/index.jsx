@@ -65,6 +65,10 @@ export default function Home() {
 
   const dates = [...Array(28).keys()];
 
+  useEffect(() => {
+    checkbox.current.checked = !customPeriod;
+  }, [customPeriod]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -91,7 +95,6 @@ export default function Home() {
             layout
             onClick={() => {
               setCustomPeriod(!customPeriod);
-              checkbox.current.checked = !customPeriod;
             }}
           >
             <Description layout>Custom reset date?</Description>
