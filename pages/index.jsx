@@ -45,9 +45,10 @@ export default function Home() {
   const dailyBudget = budget / currentDate.daysInMonth;
   const weeklyBudget = dailyBudget * 7;
   const todaysBudget = dailyBudget * daysPast;
-  const decimalBudget = todaysBudget / budget;
+  const decimalBudget = (todaysBudget / budget) * 100;
 
   let color = "lightgreen";
+  let backgroundColor = "#daf8da";
 
   let diffToBudget = Math.floor(todaysBudget) - spend;
   if (diffToBudget === 0) diffToBudget = false;
@@ -56,8 +57,12 @@ export default function Home() {
   if (diffToBudget < 0) {
     relativeToBudget = "behind your";
     color = "orange";
+    backgroundColor = "#ffe4be";
   }
-  if (diffToBudget < -99) color = "red";
+  if (diffToBudget < -99) {
+    color = "red";
+    backgroundColor = "#ffdbd8";
+  }
 
   const daysLeft = currentDate.daysInMonth - daysPast;
   const newDailyBudget = (budget - spend) / daysLeft;
@@ -66,6 +71,8 @@ export default function Home() {
   const checkbox = useRef(null);
 
   const dates = [...Array(28).keys()];
+
+  const markerPosition = decimalBudget * 2.77 + 58;
 
   useEffect(() => {
     checkbox.current.checked = customPeriod;
@@ -157,25 +164,25 @@ export default function Home() {
             />
           </InputWrapper>
           <Spacer />
-          <motion.svg height="60" width="90%">
+          <motion.svg height="60" width="95%">
             <Line
-              x1="20%"
+              x1="15%"
               x2="100%"
               y1="50%"
               y2="50%"
               stroke="#e2e2e2"
               initial={{ pathLength: 0 }}
-              animate={{ pathLength: 0.8 }}
+              animate={{ pathLength: 0.85 }}
               transition={{
                 type: "spring",
-                stiffness: 180,
+                stiffness: 100,
                 restSpeed: 0.0001,
                 restDelta: 0.0001,
               }}
             />
             <Line
-              x1="20%"
-              x2="75%"
+              x1="15%"
+              x2="87.2%"
               y1="50%"
               y2="50%"
               stroke={color}
@@ -183,8 +190,35 @@ export default function Home() {
               animate={{ pathLength: decimalSpend || 0 }}
               transition={{ type: "spring", bounce: 0, duration: 1.5 }}
             />
-            <Marker x1="20%" x2="20%" y1="35%" y2="65%" stroke="grey" />
+            <Marker
+              initial={{ x1: 54, x2: 54 }}
+              animate={{ x1: markerPosition || 54, x2: markerPosition || 54 }}
+              transition={{
+                type: "spring",
+                stiffness: 150,
+                mass: 1.3,
+                damping: 12,
+                restSpeed: 0.0001,
+                restDelta: 0.0001,
+              }}
+              y1="36%"
+              y2="64%"
+              stroke="grey"
+            />
           </motion.svg>
+          <SummaryDescription
+            color={backgroundColor}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 2 }}
+          >
+            You are{" "}
+            <Bold color={color}>
+              {diffToBudget && <span>£</span>}
+              {diffToBudget && Math.abs(diffToBudget)}
+            </Bold>{" "}
+            {relativeToBudget} budget
+          </SummaryDescription>
           <Spacer />
           <Subheading>Initial Budget</Subheading>
           <Description>
@@ -203,15 +237,6 @@ export default function Home() {
           </Description>
           <Description>
             Your budget up to today is <Bold>£{Math.floor(todaysBudget)}</Bold>
-          </Description>
-          <Spacer />
-          <Description>
-            Therefore you are{" "}
-            <Color color={color}>
-              {diffToBudget && <span>£</span>}
-              {diffToBudget && Math.abs(diffToBudget)} {relativeToBudget} budget
-            </Color>{" "}
-            so far
           </Description>
           <Spacer />
           {diffToBudget > 20 && daysLeft > 0 && (
@@ -377,7 +402,7 @@ const Everything = styled(motion.div)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 500px;
+  width: 400px;
 `;
 
 const Line = styled(motion.line)`
@@ -389,4 +414,12 @@ const Line = styled(motion.line)`
 const Marker = styled(motion.line)`
   stroke-linecap: round;
   stroke-width: 2px;
+`;
+
+const SummaryDescription = styled(motion.div)`
+  padding: 10px 20px;
+  background-color: ${(props) => props.color};
+  border-radius: 12px;
+  margin-top: 8px;
+  margin-bottom: 20px;
 `;
