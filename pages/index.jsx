@@ -39,11 +39,13 @@ export default function Home() {
 
   const daysPast = Math.floor(days.days);
 
+  const decimalSpend = spend / budget;
   const percentageSpend = Math.round((spend / budget) * 100);
 
   const dailyBudget = budget / currentDate.daysInMonth;
   const weeklyBudget = dailyBudget * 7;
   const todaysBudget = dailyBudget * daysPast;
+  const decimalBudget = todaysBudget / budget;
 
   let color = "lightgreen";
 
@@ -155,6 +157,35 @@ export default function Home() {
             />
           </InputWrapper>
           <Spacer />
+          <motion.svg height="60" width="90%">
+            <Line
+              x1="20%"
+              x2="100%"
+              y1="50%"
+              y2="50%"
+              stroke="#e2e2e2"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 0.8 }}
+              transition={{
+                type: "spring",
+                stiffness: 180,
+                restSpeed: 0.0001,
+                restDelta: 0.0001,
+              }}
+            />
+            <Line
+              x1="20%"
+              x2="75%"
+              y1="50%"
+              y2="50%"
+              stroke={color}
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: decimalSpend || 0 }}
+              transition={{ type: "spring", bounce: 0, duration: 1.5 }}
+            />
+            <Marker x1="20%" x2="20%" y1="35%" y2="65%" stroke="grey" />
+          </motion.svg>
+          <Spacer />
           <Subheading>Initial Budget</Subheading>
           <Description>
             You can spend £{Math.floor(dailyBudget)} a day
@@ -183,7 +214,7 @@ export default function Home() {
             so far
           </Description>
           <Spacer />
-          {diffToBudget > 49 && daysLeft > 0 && (
+          {diffToBudget > 20 && daysLeft > 0 && (
             <>
               <Subheading>Future</Subheading>
               <Description>
@@ -191,7 +222,7 @@ export default function Home() {
               </Description>
             </>
           )}
-          {diffToBudget < -50 && daysLeft > 0 && (
+          {diffToBudget < -20 && daysLeft > 0 && (
             <>
               <Subheading>Future</Subheading>
               <Description>
@@ -346,4 +377,16 @@ const Everything = styled(motion.div)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 500px;
+`;
+
+const Line = styled(motion.line)`
+  stroke-width: 10px;
+  stroke-linecap: round;
+  fill: transparent;
+`;
+
+const Marker = styled(motion.line)`
+  stroke-linecap: round;
+  stroke-width: 2px;
 `;
