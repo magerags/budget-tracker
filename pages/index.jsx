@@ -219,6 +219,7 @@ export default function Home() {
             </Bold>{" "}
             {relativeToBudget} budget
           </SummaryDescription>
+          <Description>{daysLeft} days left</Description>
           <Spacer />
           <Subheading>Initial Budget</Subheading>
           <Description>
