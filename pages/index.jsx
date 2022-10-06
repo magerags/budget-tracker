@@ -219,7 +219,6 @@ export default function Home() {
             </Bold>{" "}
             {relativeToBudget} budget
           </SummaryDescription>
-          <Description>{daysLeft} days left</Description>
           <Spacer />
           <Subheading>Initial Budget</Subheading>
           <Description>
@@ -233,6 +232,7 @@ export default function Home() {
           <Description>
             You are <Bold>{daysPast}</Bold> days into your budget period
           </Description>
+          <Description>{daysLeft} days left</Description>
           <Description>
             You have spent <Bold>{percentageSpend}%</Bold> of your budget
           </Description>
