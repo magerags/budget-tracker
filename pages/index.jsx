@@ -232,7 +232,9 @@ export default function Home() {
           <Description>
             You are <Bold>{daysPast}</Bold> days into your budget period
           </Description>
-          <Description>{daysLeft} days left</Description>
+          <Description>
+            You have <Bold>{daysLeft}</Bold> days left
+          </Description>
           <Description>
             You have spent <Bold>{percentageSpend}%</Bold> of your budget
           </Description>
