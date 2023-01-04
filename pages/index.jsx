@@ -12,7 +12,7 @@ export default function Home() {
   const [customPeriod, setCustomPeriod] = useStickyState("customPeriod", false);
   const [monthResetDate, setMonthResetDate] = useStickyState(
     "monthResetDate",
-    20
+    27
   );
 
   const currentDate = DateTime.now();
