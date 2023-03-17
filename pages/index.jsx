@@ -7,7 +7,7 @@ import useStickyState from "../hooks/useStickyState";
 import { motion } from "framer-motion";
 
 export default function Home() {
-  const [spend, setSpend] = useState(0);
+  const [spend, setSpend] = useStickyState("spend", 0);
   const [budget, setBudget] = useStickyState("budget", 1000);
   const [customPeriod, setCustomPeriod] = useStickyState("customPeriod", false);
   const [monthResetDate, setMonthResetDate] = useStickyState(
