@@ -1,19 +1,48 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import React, { useEffect, useState, useRef } from "react";
 import { DateTime } from "luxon";
 import styled, { ThemeProvider } from "styled-components";
-import useStickyState from "../hooks/useStickyState";
+import useBudgetData from "../hooks/useBudgetData";
 import { motion } from "framer-motion";
 
 export default function Home() {
-  const [spend, setSpend] = useStickyState("spend", 0);
-  const [budget, setBudget] = useStickyState("budget", 1000);
-  const [customPeriod, setCustomPeriod] = useStickyState("customPeriod", false);
-  const [monthResetDate, setMonthResetDate] = useStickyState(
-    "monthResetDate",
-    27
-  );
+  const [user, setUser] = useState("Tom");
+  const [spend, setSpend] = useState(0);
+  const [excludedFromBudget, setExcludedFromBudget] = useState(0);
+  const [budget, setBudget] = useState(1000);
+  const [customPeriod, setCustomPeriod] = useState(false);
+  const [monthResetDate, setMonthResetDate] = useState(27);
+
+  const { data, isLoading, isError, mutate } = useBudgetData(user);
+
+  useEffect(() => {
+    if (data) {
+      setSpend(data.spend || 0);
+      setExcludedFromBudget(data.excludedFromBudget || 0);
+      setBudget(data.budget || 1000);
+      setCustomPeriod(data.customPeriod || false);
+      setMonthResetDate(data.monthResetDate || 27);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (data) {
+      mutate({
+        userId: user,
+        data: {
+          spend,
+          excludedFromBudget,
+          budget,
+          customPeriod,
+          monthResetDate,
+        },
+      });
+    }
+  }, [spend, excludedFromBudget, budget, customPeriod, monthResetDate, data, user, mutate]);
+
+  console.log("rendering");
 
   const currentDate = DateTime.now();
   let startDate = DateTime.fromObject({
@@ -40,8 +69,10 @@ export default function Home() {
 
   const daysPast = Math.floor(days.days);
 
-  const decimalSpend = spend / budget;
-  const percentageSpend = Math.round((spend / budget) * 100);
+  const actualSpend = spend - excludedFromBudget;
+
+  const decimalSpend = actualSpend / budget;
+  const percentageSpend = Math.round((actualSpend / budget) * 100);
 
   const dailyBudget = budget / currentDate.daysInMonth;
   const weeklyBudget = dailyBudget * 7;
@@ -51,7 +82,7 @@ export default function Home() {
   let color = "lightgreen";
   let backgroundColor = "#daf8da";
 
-  let diffToBudget = Math.floor(todaysBudget) - spend;
+  let diffToBudget = Math.floor(todaysBudget) - actualSpend;
   if (diffToBudget === 0) diffToBudget = false;
   let relativeToBudget = "ahead of";
   if (diffToBudget == 0) relativeToBudget = "spot on your";
@@ -79,207 +110,191 @@ export default function Home() {
     checkbox.current.checked = customPeriod;
   }, [customPeriod]);
 
-  const theme = {};
+  if (isLoading) return <div>Loading...</div>;
+
+  if (isError) return <div>Error</div>;
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className={styles.container}>
-        <Head>
-          <title>Budget Tracker</title>
-          <meta
-            name="description"
-            content="Track how far through your budget you are"
-          />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
+    <div className={styles.container}>
+      <Head>
+        <title>Budget Tracker</title>
+        <meta name="description" content="Track how far through your budget you are" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
 
-        <main className={styles.main}>
-          <Title className={styles.title} layout>
-            Budget Tracker
-          </Title>
-          <Spacer />
-          <OptionBox
+      <main className={styles.main}>
+        <Title className={styles.title} layout>
+          Budget Tracker
+        </Title>
+        <Spacer />
+        <OptionBox
+          layout
+          transition={{
+            type: "spring",
+          }}
+        >
+          <SwitchWrapper
             layout
-            transition={{
-              type: "spring",
+            onClick={() => {
+              setCustomPeriod(!customPeriod);
             }}
           >
-            <SwitchWrapper
-              layout
-              onClick={() => {
-                setCustomPeriod(!customPeriod);
-              }}
-            >
-              <Description tooLight={true} layout>
-                Custom reset date?
-              </Description>
-              <Switch layout>
-                <SwitchInput
-                  layout
-                  disabled="true"
-                  ref={checkbox}
-                  type="checkbox"
-                  value={customPeriod}
-                />
-                <Slider />
-              </Switch>
-            </SwitchWrapper>
-            {customPeriod && (
-              <DateSelectWrapper
-                tooLight={true}
-                layout
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
-              >
-                <Label>Select a date</Label>
-                <Select
-                  tooLight={true}
-                  value={monthResetDate}
-                  onChange={(e) => setMonthResetDate(e.target.value)}
-                >
-                  {dates.map((n) => {
-                    return (
-                      <Option key={n + 1} value={n + 1}>
-                        {n + 1}
-                      </Option>
-                    );
-                  })}
-                </Select>
-              </DateSelectWrapper>
-            )}
-          </OptionBox>
-          <Spacer />
-          <Everything layout>
-            <InputWrapper>
-              <Label>Your budget: </Label>
-              <Input
-                value={budget}
-                onChange={(e) => setBudget(e.target.value)}
-                label="Budget"
-                name="budget"
-                type="number"
-              />
-            </InputWrapper>
-            <InputWrapper>
-              <Label>Your spend: </Label>
-              <Input
-                value={spend}
-                onChange={(e) => setSpend(e.target.value)}
-                label="Spend"
-                name="spend"
-                type="number"
-              />
-            </InputWrapper>
-            <Spacer />
-            <motion.svg height="60" width="95%">
-              <Line
-                x1="15%"
-                x2="100%"
-                y1="50%"
-                y2="50%"
-                stroke="#e2e2e2"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 0.85 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 100,
-                  restSpeed: 0.0001,
-                  restDelta: 0.0001,
-                }}
-              />
-              <Line
-                x1="15%"
-                x2="87.2%"
-                y1="50%"
-                y2="50%"
-                stroke={color}
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: decimalSpend || 0 }}
-                transition={{ type: "spring", bounce: 0, duration: 1.5 }}
-              />
-              <Marker
-                initial={{ x1: 54, x2: 54 }}
-                animate={{ x1: markerPosition || 54, x2: markerPosition || 54 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 150,
-                  mass: 1.3,
-                  damping: 12,
-                  restSpeed: 0.0001,
-                  restDelta: 0.0001,
-                }}
-                y1="36%"
-                y2="64%"
-                stroke="grey"
-              />
-            </motion.svg>
-            <SummaryDescription
+            <Description tooLight={true} layout>
+              Custom reset date?
+            </Description>
+            <Switch layout>
+              <SwitchInput layout disabled="true" ref={checkbox} type="checkbox" value={customPeriod} />
+              <Slider />
+            </Switch>
+          </SwitchWrapper>
+          {customPeriod && (
+            <DateSelectWrapper
               tooLight={true}
-              color={backgroundColor}
+              layout
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 2 }}
+              transition={{ delay: 0.1 }}
             >
-              You are{" "}
-              <Bold color={color}>
-                {diffToBudget && <span>£</span>}
-                {diffToBudget && Math.abs(diffToBudget)}
-              </Bold>{" "}
-              {relativeToBudget} budget
-            </SummaryDescription>
-            <Spacer />
-            <Subheading>Initial Budget</Subheading>
-            <Description>
-              You can spend £{Math.floor(dailyBudget)} a day
-            </Description>
-            <Description>
-              You can spend £{Math.floor(weeklyBudget)} a week
-            </Description>
-            <Spacer />
-            <Subheading>Progress</Subheading>
-            <Description>
-              You are <Bold>{daysPast}</Bold> days into your budget period
-            </Description>
-            <Description>
-              You have <Bold>{daysLeft}</Bold> days left
-            </Description>
-            <Description>
-              You have spent <Bold>{percentageSpend}%</Bold> of your budget
-            </Description>
-            <Description>
-              Your budget up to today is{" "}
-              <Bold>£{Math.floor(todaysBudget)}</Bold>
-            </Description>
-            <Spacer />
-            {diffToBudget > 20 && daysLeft > 0 && (
-              <>
-                <Subheading>Future</Subheading>
-                <Description>
-                  You can now spend £{Math.floor(newDailyBudget)} a day
-                </Description>
-              </>
-            )}
-            {diffToBudget < -20 && daysLeft > 0 && (
-              <>
-                <Subheading>Future</Subheading>
-                <Description>
-                  Try to spend less than £{Math.floor(newDailyBudget)} day
-                </Description>
-              </>
-            )}
-            {daysLeft == 0 && diffToBudget > 1 && (
-              <>
-                <Subheading>Future</Subheading>
-                <Description>
-                  You have £{Math.floor(budget - spend)} left to spend today!
-                </Description>
-              </>
-            )}
-          </Everything>
-        </main>
-      </div>
-    </ThemeProvider>
+              <Label>Select a date</Label>
+              <Select tooLight={true} value={monthResetDate} onChange={(e) => setMonthResetDate(e.target.value)}>
+                {dates.map((n) => {
+                  return (
+                    <Option key={n + 1} value={n + 1}>
+                      {n + 1}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </DateSelectWrapper>
+          )}
+        </OptionBox>
+        <Spacer />
+        <Everything layout>
+          <InputWrapper>
+            <Label>Your budget: </Label>
+            <Input
+              value={budget}
+              onChange={(e) => setBudget(e.target.value)}
+              label="Budget"
+              name="budget"
+              type="number"
+            />
+          </InputWrapper>
+          <InputWrapper>
+            <Label>Your total spend: </Label>
+            <Input value={spend} onChange={(e) => setSpend(e.target.value)} label="Spend" name="spend" type="number" />
+          </InputWrapper>
+          <InputWrapper>
+            <Label>excluded spend: </Label>
+            <Input
+              value={excludedFromBudget}
+              onChange={(e) => setExcludedFromBudget(e.target.value)}
+              label="excluded spend"
+              name="excludedSpend"
+              type="number"
+            />
+          </InputWrapper>
+          <Spacer />
+          <Description>
+            You have spent <Bold>£{Math.floor(spend - excludedFromBudget)}</Bold> so far
+          </Description>
+          <Spacer />
+          <motion.svg height="60" width="95%">
+            <Line
+              x1="15%"
+              x2="100%"
+              y1="50%"
+              y2="50%"
+              stroke="#e2e2e2"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 0.85 }}
+              transition={{
+                type: "spring",
+                stiffness: 100,
+                restSpeed: 0.0001,
+                restDelta: 0.0001,
+              }}
+            />
+            <Line
+              x1="15%"
+              x2="87.2%"
+              y1="50%"
+              y2="50%"
+              stroke={color}
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: decimalSpend || 0 }}
+              transition={{ type: "spring", bounce: 0, duration: 1.5 }}
+            />
+            <Marker
+              initial={{ x1: 54, x2: 54 }}
+              animate={{ x1: markerPosition || 54, x2: markerPosition || 54 }}
+              transition={{
+                type: "spring",
+                stiffness: 150,
+                mass: 1.3,
+                damping: 12,
+                restSpeed: 0.0001,
+                restDelta: 0.0001,
+              }}
+              y1="36%"
+              y2="64%"
+              stroke="grey"
+            />
+          </motion.svg>
+          <SummaryDescription
+            tooLight={true}
+            color={backgroundColor}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 2 }}
+          >
+            You are{" "}
+            <Bold color={color}>
+              {diffToBudget && <span>£</span>}
+              {diffToBudget && Math.abs(diffToBudget)}
+            </Bold>{" "}
+            {relativeToBudget} budget
+          </SummaryDescription>
+          <Spacer />
+          <Subheading>Initial Budget</Subheading>
+          <Description>You can spend £{Math.floor(dailyBudget)} a day</Description>
+          <Description>You can spend £{Math.floor(weeklyBudget)} a week</Description>
+          <Spacer />
+          <Subheading>Progress</Subheading>
+          <Description>
+            You are <Bold>{daysPast}</Bold> days into your budget period
+          </Description>
+          <Description>
+            You have <Bold>{daysLeft}</Bold> days left
+          </Description>
+          <Description>
+            You have spent <Bold>{percentageSpend}%</Bold> of your budget
+          </Description>
+          <Description>
+            Your budget up to today is <Bold>£{Math.floor(todaysBudget)}</Bold>
+          </Description>
+          <Spacer />
+          {diffToBudget > 20 && daysLeft > 0 && (
+            <>
+              <Subheading>Future</Subheading>
+              <Description>You can now spend £{Math.floor(newDailyBudget)} a day</Description>
+            </>
+          )}
+          {diffToBudget < -20 && daysLeft > 0 && (
+            <>
+              <Subheading>Future</Subheading>
+              <Description>Try to spend less than £{Math.floor(newDailyBudget)} day</Description>
+            </>
+          )}
+          {daysLeft == 0 && diffToBudget > 1 && (
+            <>
+              <Subheading>Future</Subheading>
+              <Description>You have £{Math.floor(budget - spend)} left to spend today!</Description>
+            </>
+          )}
+        </Everything>
+      </main>
+    </div>
   );
 }
 

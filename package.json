@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^4.28.0",
     "framer-motion": "^7.3.3",
     "luxon": "^3.0.1",
     "next": "12.2.3",
