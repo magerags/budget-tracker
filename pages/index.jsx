@@ -15,9 +15,12 @@ export default function Home() {
   const [customPeriod, setCustomPeriod] = useState(false);
   const [monthResetDate, setMonthResetDate] = useState(27);
 
-  const { data, isLoading, isError, mutate } = useBudgetData(user);
+  const { query, mutation } = useBudgetData(user);
+  const { data, isLoading, isError } = query;
+  const { mutate } = mutation;
 
   useEffect(() => {
+    console.log("data changed", data);
     if (data) {
       setSpend(data.spend || 0);
       setExcludedFromBudget(data.excludedFromBudget || 0);
@@ -40,9 +43,7 @@ export default function Home() {
         },
       });
     }
-  }, [spend, excludedFromBudget, budget, customPeriod, monthResetDate, data, user, mutate]);
-
-  console.log("rendering");
+  }, [spend, excludedFromBudget, budget, customPeriod, monthResetDate]);
 
   const currentDate = DateTime.now();
   let startDate = DateTime.fromObject({
@@ -110,9 +111,9 @@ export default function Home() {
     checkbox.current.checked = customPeriod;
   }, [customPeriod]);
 
-  if (isLoading) return <div>Loading...</div>;
+  // if (isLoading) return <div>Loading...</div>;
 
-  if (isError) return <div>Error</div>;
+  // if (isError) return <div>Error</div>;
 
   return (
     <div className={styles.container}>

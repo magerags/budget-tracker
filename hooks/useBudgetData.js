@@ -16,7 +16,6 @@ const createUser = async (userId) => {
 };
 
 const fetchUserData = async (userId) => {
-  console.log("fetching user data");
   const response = await fetch(
     `https://budget-tomwhittl-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json`
   );
@@ -44,14 +43,14 @@ const updateUserData = async ({ userId, data }) => {
 const useBudgetData = (userId) => {
   const query = useQuery({
     queryKey: ["userData", userId],
-    queryFn: fetchUserData(userId),
+    queryFn: () => fetchUserData(userId),
   });
 
   const mutation = useMutation({
-    mutationFn: updateUserData,
+    mutationFn: (data) => updateUserData(data),
   });
 
-  return { ...query, ...mutation };
+  return { query: { ...query }, mutation: { ...mutation } };
 };
 
 export default useBudgetData;
