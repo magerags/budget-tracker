@@ -98,7 +98,7 @@ export default function Home() {
   }
 
   const daysLeft = currentDate.daysInMonth - daysPast;
-  const newDailyBudget = (budget - spend) / daysLeft;
+  const newDailyBudget = (budget - actualSpend) / daysLeft;
   const newWeeklyBudget = newDailyBudget * 7;
 
   const checkbox = useRef(null);
@@ -290,7 +290,7 @@ export default function Home() {
           {daysLeft == 0 && diffToBudget > 1 && (
             <>
               <Subheading>Future</Subheading>
-              <Description>You have £{Math.floor(budget - spend)} left to spend today!</Description>
+              <Description>You have £{Math.floor(budget - actualSpend)} left to spend today!</Description>
             </>
           )}
         </Everything>
