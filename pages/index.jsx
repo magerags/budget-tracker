@@ -111,10 +111,6 @@ export default function Home() {
     checkbox.current.checked = customPeriod;
   }, [customPeriod]);
 
-  // if (isLoading) return <div>Loading...</div>;
-
-  // if (isError) return <div>Error</div>;
-
   return (
     <div className={styles.container}>
       <Head>
@@ -256,6 +252,10 @@ export default function Home() {
             </Bold>{" "}
             {relativeToBudget} budget
           </SummaryDescription>
+          <Spacer size={10} />
+          <Description>
+            You have <Bold>£{Math.floor(budget - (spend - excludedFromBudget))}</Bold> left in your budget
+          </Description>
           <Spacer />
           <Subheading>Initial Budget</Subheading>
           <Description>You can spend £{Math.floor(dailyBudget)} a day</Description>
@@ -332,7 +332,7 @@ const Bold = styled.span`
 `;
 
 const Spacer = styled.div`
-  margin: 20px;
+  margin: ${(props) => (props.size ? props.size : 20)}px 0;
 `;
 
 const Color = styled.span`
