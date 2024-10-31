@@ -68,7 +68,9 @@ export default function Home() {
 
   const days = currentDate.diff(startDate, "days").toObject();
 
-  const daysPast = Math.floor(days.days);
+  console.log("days", days);
+
+  const daysPast = Math.ceil(days.days);
 
   const actualSpend = spend - excludedFromBudget;
 
@@ -115,7 +117,10 @@ export default function Home() {
     <div className={styles.container}>
       <Head>
         <title>Budget Tracker</title>
-        <meta name="description" content="Track how far through your budget you are" />
+        <meta
+          name="description"
+          content="Track how far through your budget you are"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -140,7 +145,13 @@ export default function Home() {
               Custom reset date?
             </Description>
             <Switch layout>
-              <SwitchInput layout disabled="true" ref={checkbox} type="checkbox" value={customPeriod} />
+              <SwitchInput
+                layout
+                disabled="true"
+                ref={checkbox}
+                type="checkbox"
+                value={customPeriod}
+              />
               <Slider />
             </Switch>
           </SwitchWrapper>
@@ -153,7 +164,11 @@ export default function Home() {
               transition={{ delay: 0.1 }}
             >
               <Label>Select a date</Label>
-              <Select tooLight={true} value={monthResetDate} onChange={(e) => setMonthResetDate(e.target.value)}>
+              <Select
+                tooLight={true}
+                value={monthResetDate}
+                onChange={(e) => setMonthResetDate(e.target.value)}
+              >
                 {dates.map((n) => {
                   return (
                     <Option key={n + 1} value={n + 1}>
@@ -179,7 +194,13 @@ export default function Home() {
           </InputWrapper>
           <InputWrapper>
             <Label>Your total spend: </Label>
-            <Input value={spend} onChange={(e) => setSpend(e.target.value)} label="Spend" name="spend" type="number" />
+            <Input
+              value={spend}
+              onChange={(e) => setSpend(e.target.value)}
+              label="Spend"
+              name="spend"
+              type="number"
+            />
           </InputWrapper>
           <InputWrapper>
             <Label>excluded spend: </Label>
@@ -193,7 +214,8 @@ export default function Home() {
           </InputWrapper>
           <Spacer />
           <Description>
-            You have spent <Bold>£{Math.floor(spend - excludedFromBudget)}</Bold> so far
+            You have spent{" "}
+            <Bold>£{Math.floor(spend - excludedFromBudget)}</Bold> so far
           </Description>
           <Spacer />
           <motion.svg height="60" width="95%">
@@ -254,12 +276,18 @@ export default function Home() {
           </SummaryDescription>
           <Spacer size={10} />
           <Description>
-            You have <Bold>£{Math.floor(budget - (spend - excludedFromBudget))}</Bold> left in your budget
+            You have{" "}
+            <Bold>£{Math.floor(budget - (spend - excludedFromBudget))}</Bold>{" "}
+            left in your budget
           </Description>
           <Spacer />
           <Subheading>Initial Budget</Subheading>
-          <Description>You can spend £{Math.floor(dailyBudget)} a day</Description>
-          <Description>You can spend £{Math.floor(weeklyBudget)} a week</Description>
+          <Description>
+            You can spend £{Math.floor(dailyBudget)} a day
+          </Description>
+          <Description>
+            You can spend £{Math.floor(weeklyBudget)} a week
+          </Description>
           <Spacer />
           <Subheading>Progress</Subheading>
           <Description>
@@ -278,19 +306,26 @@ export default function Home() {
           {diffToBudget > 20 && daysLeft > 0 && (
             <>
               <Subheading>Future</Subheading>
-              <Description>You can now spend £{Math.floor(newDailyBudget)} a day</Description>
+              <Description>
+                You can now spend £{Math.floor(newDailyBudget)} a day
+              </Description>
             </>
           )}
           {diffToBudget < -20 && daysLeft > 0 && (
             <>
               <Subheading>Future</Subheading>
-              <Description>Try to spend less than £{Math.floor(newDailyBudget)} day</Description>
+              <Description>
+                Try to spend less than £{Math.floor(newDailyBudget)} day
+              </Description>
             </>
           )}
           {daysLeft == 0 && diffToBudget > 1 && (
             <>
               <Subheading>Future</Subheading>
-              <Description>You have £{Math.floor(budget - actualSpend)} left to spend today!</Description>
+              <Description>
+                You have £{Math.floor(budget - actualSpend)} left to spend
+                today!
+              </Description>
             </>
           )}
         </Everything>
@@ -453,7 +488,8 @@ const SummaryDescription = styled(motion.div)`
   padding: 10px 20px;
   background-color: ${(props) => props.color};
   border-radius: 12px;
-  margin-top: 8px;
+  margin-top: -8px;
+  transform: translateX(5px);
   margin-bottom: 20px;
   color: ${(props) => (props.tooLight ? "black" : "white")};
 `;
