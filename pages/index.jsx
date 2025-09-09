@@ -19,8 +19,9 @@ export default function Home() {
   const { data, isLoading, isError } = query;
   const { mutate } = mutation;
 
+  // console.log(data);
+
   useEffect(() => {
-    console.log("data changed", data);
     if (data) {
       setSpend(data.spend || 0);
       setExcludedFromBudget(data.excludedFromBudget || 0);
@@ -68,8 +69,6 @@ export default function Home() {
 
   const days = currentDate.diff(startDate, "days").toObject();
 
-  console.log("days", days);
-
   const daysPast = Math.ceil(days.days);
 
   const actualSpend = spend - excludedFromBudget;
@@ -102,6 +101,12 @@ export default function Home() {
   const daysLeft = currentDate.daysInMonth - daysPast;
   const newDailyBudget = (budget - actualSpend) / daysLeft;
   const newWeeklyBudget = newDailyBudget * 7;
+  const totalDaysInPeriod = currentDate.daysInMonth;
+  const averageDailySpendSoFar = daysPast > 0 ? actualSpend / daysPast : 0;
+  const projectedTotalSpendAtCurrentRate =
+    averageDailySpendSoFar * totalDaysInPeriod;
+  const projectedSavingsAtCurrentRate =
+    budget - projectedTotalSpendAtCurrentRate;
 
   const checkbox = useRef(null);
 
@@ -309,6 +314,28 @@ export default function Home() {
               <Description>
                 You can now spend £{Math.floor(newDailyBudget)} a day
               </Description>
+              <Description>
+                You will spend{" "}
+                <Bold>£{Math.floor(projectedTotalSpendAtCurrentRate)}</Bold> at
+                this rate
+              </Description>
+              <Description>
+                {projectedSavingsAtCurrentRate >= 0 ? (
+                  <>
+                    You will save{" "}
+                    <Bold>£{Math.floor(projectedSavingsAtCurrentRate)}</Bold> at
+                    this rate
+                  </>
+                ) : (
+                  <>
+                    You will overspend by{" "}
+                    <Bold>
+                      £{Math.floor(Math.abs(projectedSavingsAtCurrentRate))}
+                    </Bold>{" "}
+                    at this rate
+                  </>
+                )}
+              </Description>
             </>
           )}
           {diffToBudget < -20 && daysLeft > 0 && (
@@ -316,6 +343,28 @@ export default function Home() {
               <Subheading>Future</Subheading>
               <Description>
                 Try to spend less than £{Math.floor(newDailyBudget)} day
+              </Description>
+              <Description>
+                You will spend{" "}
+                <Bold>£{Math.floor(projectedTotalSpendAtCurrentRate)}</Bold> at
+                this rate
+              </Description>
+              <Description>
+                {projectedSavingsAtCurrentRate >= 0 ? (
+                  <>
+                    You will save{" "}
+                    <Bold>£{Math.floor(projectedSavingsAtCurrentRate)}</Bold> at
+                    this rate
+                  </>
+                ) : (
+                  <>
+                    You will overspend by{" "}
+                    <Bold>
+                      £{Math.floor(Math.abs(projectedSavingsAtCurrentRate))}
+                    </Bold>{" "}
+                    at this rate
+                  </>
+                )}
               </Description>
             </>
           )}

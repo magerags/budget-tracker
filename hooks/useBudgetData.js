@@ -9,10 +9,13 @@ const createUser = async (userId) => {
     monthResetDate: 27,
   };
 
-  await fetch(`https://budget-tomwhittl-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json`, {
-    method: "PUT",
-    body: JSON.stringify(defaultData),
-  });
+  await fetch(
+    `https://budget-tomwhittl-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json`,
+    {
+      method: "PUT",
+      body: JSON.stringify(defaultData),
+    }
+  );
 };
 
 const fetchUserData = async (userId) => {
